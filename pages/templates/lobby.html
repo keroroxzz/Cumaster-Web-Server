@@ -1,0 +1,202 @@
+<!--Cumaster by RTU
+	version: v1.01.
+	Date: 2021-11-13
+	license: CC BY-NC-SA 3.0-->
+<!DOCTYPE html>
+{% load static %}
+<link rel="stylesheet" href="{% static 'pages/style.css' %}"/>
+<script src="https://kit.fontawesome.com/f224dab82c.js" crossorigin="anonymous"></script>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>屌子棋競技場</title>
+	</head>
+	<body onload="initialize()" class="mainframe" id="bodyframe">
+		<div class="header" id="header">
+			<div></div>
+			<a>Cumaster Arena</a>
+		</div>
+		<div class="mainframe" id="middleframe" style="grid-template-rows: 0.4fr 0.5fr repeat(5, 1fr) 40px;" >
+			<div class="toolbar" style="grid-template-columns: 11.8fr 0.2fr 1fr 1fr; background-color: transparent;">
+				<input id="nameinput" placeholder="創建或搜尋房名" style="border:0; border-color: rgb(199, 199, 199);"></input>
+				<div></div>
+				<button class="button" onclick="createNewRoom()"><i class="fas fa-plus-circle"></i></button>
+				<button class="button" onclick="aquireRoomState(nameinput.value)"><i class="fas fa-search"></i></button>
+			</div>
+			<div class="toolbar" style="grid-template-columns: 1.2fr 3.5fr 1.5fr 1fr;">
+				<div></div>
+				<div id="namebar"><a id="playername" ></a></div>
+				<div></div>
+				<button class="button" onclick="aquireRoomState()"><i class="fas fa-redo-alt"></i></button>
+			</div>
+			<div class="room">
+				<div class="roomid"><a class='roomIdText'></a></div>
+				<div class="num"><a class='roomOccupancyText'>0/2</a></div>
+				<div class="title"><a class='roomTitleText'></a></div>
+				<button class="button" onclick="accessroom(0)"><i class="fas fa-play"></i></button>
+			</div>
+			<div class="room">
+				<div class="roomid"><a class='roomIdText'></a></div>
+				<div class="num"><a class='roomOccupancyText'>0/2</a></div>
+				<div class="title"><a class='roomTitleText'></a></div>
+				<button class="button" onclick="accessroom(1)"><i class="fas fa-play"></i></button>
+			</div>
+			<div class="room">
+				<div class="roomid"><a class='roomIdText'></a></div>
+				<div class="num"><a class='roomOccupancyText'>0/2</a></div>
+				<div class="title"><a class='roomTitleText'></a></div>
+				<button class="button" onclick="accessroom(2)"><i class="fas fa-play"></i></button>
+			</div>
+			<div class="room">
+				<div class="roomid"><a class='roomIdText'></a></div>
+				<div class="num"><a class='roomOccupancyText'>0/2</a></div>
+				<div class="title"><a class='roomTitleText'></a></div>
+				<button class="button" onclick="accessroom(3)"><i class="fas fa-play"></i></button>
+			</div>
+			<div class="room">
+				<div class="roomid"><a class='roomIdText'></a></div>
+				<div class="num"><a class='roomOccupancyText'>0/2</a></div>
+				<div class="title"><a class='roomTitleText'></a></div>
+				<button class="button" onclick="accessroom(4)"><i class="fas fa-play"></i></button>
+			</div>
+			<div id="selectorbaar">
+				<div id="left" class="button" onclick="left()"><i class="fas fa-angle-left"></i></div>
+				<div id="page"><a id="pagenum"></a></div>
+				<div id="right" class="button" onclick="right()"><i class="fas fa-angle-right"></i></div>
+			</div>
+		</div>
+		<script src="{% static 'pages/cookietoolkit.js' %}"></script>
+		<script src="{% static 'pages/notification.js' %}"></script>
+		<script>
+			var playername = cookie['name'];
+			var roomname = [{% for name in names %}'{{ name }}',{% endfor %}];
+			var roomids = [{% for id in ids %}{{ id }},{% endfor %}];
+			var roomoccupancy = [{% for occ in occupancy %}'{{ occ }}',{% endfor %}];
+			var pagebegin = 0;
+			
+			// Updatable texts in the upper bar
+			var namebox = document.getElementById('playername');
+			var pagenumber = document.getElementById('pagenum');
+			
+			// Updatable texts in the room list
+			var idTexts = document.getElementsByClassName('roomIdText');
+			var ooccTexts = document.getElementsByClassName('roomOccupancyText');
+			var titTexts = document.getElementsByClassName('roomTitleText');
+			var butTexts = document.getElementsByClassName('roomButtonText');
+
+			var nameinput = document.getElementById('nameinput');
+			
+			function initialize()
+			{
+				namebox.text = playername;
+				updateRoomInf();
+			}
+			
+			function accessroom(id)
+			{
+				if(pagebegin+id>=roomids.length) return;
+				
+				var accessid = roomids[pagebegin+id];
+				setCookieData(playername, accessid, null)
+				location = '/room-' + accessid;
+			}
+			
+			function right()
+			{
+				pagebegin += 5;
+				if(pagebegin>=roomids.length) pagebegin=0;
+				updateRoomInf();
+			}
+			
+			function left()
+			{
+				pagebegin -= 5;
+				if(pagebegin<0) pagebegin=Math.floor(roomids.length/5)*5;
+				updateRoomInf();
+			}
+			
+			function a(element)
+			{
+				return element.getElementsByTagName('a')[0];
+			}
+
+			function createNewRoom()
+			{
+				if(nameinput.value.length==0)
+				{
+					alert('請輸入房間名稱');
+					return;
+				}
+				var http_req = new XMLHttpRequest();
+				http_req.onreadystatechange = function()
+				{
+					if(http_req.readyState === 4)
+					{
+						if(http_req.response.length>0)
+						{
+							var data = JSON.parse(http_req.response)
+							if(data['msg'] != null){
+								alert("無法開啟新房間!");
+							}
+							else{
+								roomid = data["id"];
+								setCookieData(playername, roomid, null)
+								location = "/room-" + roomid
+							}
+						}
+					}
+				}
+				http_req.open("GET", "/create?name="+nameinput.value, true);
+				http_req.setRequestHeader('Content-Type',  'text/xml');
+				http_req.send();
+			}
+			
+			function updateRoomInf()
+			{
+				for(var i=0;i<5;i++)
+				{
+					if(i+pagebegin<roomname.length)
+					{
+						idTexts[i].text=roomids[i+pagebegin];
+						titTexts[i].text=roomname[i+pagebegin];
+						ooccTexts[i].text=roomoccupancy[i+pagebegin];
+					}
+					else
+					{
+						idTexts[i].text='';
+						titTexts[i].text='';
+						ooccTexts[i].text='0/2';
+					}
+				}
+				pagenumber.text = (pagebegin/5+1)+'/'+Math.ceil(roomids.length/5);
+			}
+			
+			//get the new states of rooms
+			function aquireRoomState(searchname)
+			{
+				var http_req = new XMLHttpRequest();
+				http_req.onreadystatechange = function()
+				{
+					if(http_req.readyState === 4)
+					{
+						if(http_req.response.length>0)
+						{
+							var data = JSON.parse(http_req.response);
+							roomname = data["name"];
+							roomids = data["id"];
+							roomoccupancy = data["occupancy"];
+							console.log(http_req.response);
+							updateRoomInf();
+						}
+					}
+				}
+				if(searchname!=null && searchname.length>0)
+					http_req.open("GET", "searchrooms?name="+searchname, true);
+				else
+					http_req.open("GET", "getallrooms", true);
+				http_req.setRequestHeader('Content-Type',  'text/xml');
+				http_req.send();
+			}
+		</script>
+	</body>
+</html>

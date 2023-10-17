@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <h2>Page View Report</h2>
+  <ul>
+    {% for game in games %}
+    <h2>{{ game.roomname }}</h2>
+    <h2>{{ game.id }}</h2>
+    <li>{{ game.names }}</li>
+    <li>{{ game.IPs }}</li>
+    <li>{{ game.passwords }}</li>
+    <li>{{ game.lastupdate }}</li>
+    <li>{{ game.board }}</li>
+    <li>{{ game.activated }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+<!--Cumaster by RTU
+	version: v1.01.
+	Date: 2021-11-13
+	license: CC BY-NC-SA 3.0-->
+<!DOCTYPE html>
+{% load static %}
+<link rel="stylesheet" href="{% static 'pages/style.css' %}"/>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>屌子棋競技場</title>
+	</head>
+	<body class="mainframe" id="bodyframe">
+		<div class="header" id="header">
+			<div></div>
+			<a>Cumaster Arena</a>
+		</div>
+		<div class="mainframe"  id="middleframe" style="grid-template-rows: repeat(3, 1fr); height: 200px;">
+			<div class="num"><a>輸入暱稱</a></div>
+			<input id="name"></input>
+			<div class="button" onclick="login()"><a>進入</a></div>
+		</div>
+		<script src="{% static 'pages/cookietoolkit.js' %}"></script>
+		<script src="{% static 'pages/notification.js' %}"></script>
+		<script>
+			var namebox = document.getElementById("name");
+			function login(){
+				if(namebox.value.length>0){
+			setCookieData(namebox.value, -1, '{{ psw }}')
+			location = '/lobby';}else{alert("Please type in your name!")}}
+			function keydown(e){if(e.key=='Enter')login();}
+			namebox.addEventListener('keydown', keydown);
+		</script>
+	</body>
+</html>
