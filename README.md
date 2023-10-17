@@ -2,7 +2,7 @@
 
 This is the source code of the Cumaster Heroku server I made a few years ago for fun.
 
-Cumaster is a Gomoku-like Go game my friend and I invented. It's more complex and funnier to play.
+Cumaster is a Gomoku-like Go game my friends and I invented. It's more complex and funnier to play.
 
 To promote this novel game, I wrote this project to enable network gaming worldwide. However, it didn't make a hit. So I opensource the project here to enable anyone who is interested in this game to hold their game server.
 
